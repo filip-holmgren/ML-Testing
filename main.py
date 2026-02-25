@@ -96,6 +96,5 @@ def main():
     rmse = root_mean_squared_error(y_test, preds)
     print(f"RMSE of the final model: {rmse:.3f}")
 
-
 if __name__ == "__main__":
     main()
