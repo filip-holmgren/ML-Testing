@@ -8,6 +8,7 @@ import pandas as pd
 import numpy as np
 import warnings
 import optuna
+import json
 
 def main():
     warnings.filterwarnings("ignore")
@@ -45,10 +46,6 @@ def main():
     X_train_res, y_train_res = smote.fit_resample(X_train, y_train)
     print(f"Resampled class distribution: {Counter(y_train_res)}")
 
-    # Compute scale_pos_weight (optional if using SMOTE)
-    scale_pos_weight = len(y_train_res[y_train_res == 0]) / max(len(y_train_res[y_train_res == 1]), 1)
-    print(f"scale_pos_weight: {scale_pos_weight:.2f}")
-
     dtrain = xgb.DMatrix(X_train_res, y_train_res)
     dtest = xgb.DMatrix(X_test, y_test)
 
@@ -58,7 +55,6 @@ def main():
             "objective": "binary:logistic",
             "tree_method": "hist",
             "eval_metric": "logloss",
-            "scale_pos_weight": scale_pos_weight,
             "learning_rate": trial.suggest_float("learning_rate", 0.01, 0.3),
             "max_depth": trial.suggest_int("max_depth", 3, 12),
             "subsample": trial.suggest_float("subsample", 0.5, 1.0),
@@ -79,14 +75,13 @@ def main():
         return cv["test-logloss-mean"].min()
 
     study = optuna.create_study(direction="minimize")
-    study.optimize(objective, n_trials=1000)  # adjust trials as needed
+    study.optimize(objective, n_trials=10)  # adjust trials as needed
 
     print("Best hyperparameters:", study.best_params)
 
     best_params = {
         "objective": "binary:logistic",
         "tree_method": "hist",
-        "scale_pos_weight": scale_pos_weight,
         **study.best_params
     }
 
@@ -134,6 +129,25 @@ def main():
         f.write(model.save_config())
     
     model.save_model("model.ubj")
+
+    category_maps = {
+        col: list(X[col].astype("category").cat.categories)
+        for col in cat_cols
+    }
+
+    with open("category_maps.json", "w") as f:
+        json.dump(category_maps, f)
+    
+    with open("threshold.json", "w") as f:
+        json.dump({"threshold": best_thresh}, f)
+    
+    meta = {
+    "numeric_cols": list(num_cols),
+    "categorical_cols": list(cat_cols)
+    }
+
+    with open("feature_meta.json", "w") as f:
+        json.dump(meta, f)
 
 if __name__ == "__main__":
     main()
