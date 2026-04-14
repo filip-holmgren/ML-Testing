@@ -22,3 +22,6 @@ Classification Report:
    macro avg       0.94      0.90      0.92       291
 weighted avg       0.98      0.98      0.98       291
 ```
+
+Class 0.0 is true positive
+Class 1.0 is false positive
