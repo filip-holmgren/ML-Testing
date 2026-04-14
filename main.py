@@ -52,9 +52,7 @@ def main():
     dtrain = xgb.DMatrix(X_train_res, y_train_res)
     dtest = xgb.DMatrix(X_test, y_test)
 
-    # -------------------------------
     # Hyperparameter tuning with Optuna
-    # -------------------------------
     def objective(trial):
         params = {
             "objective": "binary:logistic",
@@ -81,7 +79,7 @@ def main():
         return cv["test-logloss-mean"].min()
 
     study = optuna.create_study(direction="minimize")
-    study.optimize(objective, n_trials=50)  # adjust trials as needed
+    study.optimize(objective, n_trials=1000)  # adjust trials as needed
 
     print("Best hyperparameters:", study.best_params)
 
@@ -113,9 +111,7 @@ def main():
         verbose_eval=max(1, best_n_rounds // 10),
     )
 
-    # -------------------------------
     # Predict and optimize threshold
-    # -------------------------------
     preds_proba = model.predict(dtest)
 
     best_f1, best_thresh = 0, 0.5
@@ -128,9 +124,7 @@ def main():
     preds = (preds_proba > best_thresh).astype(int)
     print(f"Optimal threshold for class 1: {best_thresh:.2f}, F1: {best_f1:.4f}")
 
-    # -------------------------------
     # Evaluate
-    # -------------------------------
     accuracy = accuracy_score(y_test, preds)
     print(f"\nFinal Test Accuracy: {accuracy:.4f}\n")
     print("Classification Report:")
