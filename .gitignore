@@ -10,3 +10,5 @@ wheels/
 .venv
 
 training_data.csv*
+model.ubj
+config.json

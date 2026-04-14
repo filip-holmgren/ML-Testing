@@ -130,5 +130,10 @@ def main():
     print("Classification Report:")
     print(classification_report(y_test, preds))
 
+    with open("config.json", "w") as f:
+        f.write(model.save_config())
+    
+    model.save_model("model.ubj")
+
 if __name__ == "__main__":
     main()
