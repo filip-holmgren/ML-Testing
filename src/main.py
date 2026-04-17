@@ -1,6 +1,7 @@
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score, classification_report, f1_score
 from sklearn.preprocessing import LabelEncoder
+from sklearn.metrics import confusion_matrix
 from imblearn.over_sampling import SMOTE
 from collections import Counter
 from pathlib import Path
@@ -12,7 +13,7 @@ import optuna
 import json
 
 from src.preprocess import transform
-
+from src.confusion_matrix_generator import generate_confusion_matrix_visualization
 
 def main():
     warnings.filterwarnings("ignore")
@@ -107,23 +108,23 @@ def main():
     )
 
     # Predict and optimize threshold
-    preds_proba = model.predict(dtest)
+    y_pred_proba = model.predict(dtest)
 
     best_f1, best_thresh = 0, 0.5
     for thresh in np.arange(0.1, 0.9, 0.01):
-        preds_tmp = (preds_proba > thresh).astype(int)
+        preds_tmp = (y_pred_proba > thresh).astype(int)
         f1 = f1_score(y_test, preds_tmp)
         if f1 > best_f1:
             best_f1, best_thresh = f1, thresh
 
-    preds = (preds_proba > best_thresh).astype(int)
+    y_pred = (y_pred_proba > best_thresh).astype(int)
     print(f"Optimal threshold for class 1: {best_thresh:.2f}, F1: {best_f1:.4f}")
 
     # Evaluate
-    accuracy = accuracy_score(y_test, preds)
+    accuracy = accuracy_score(y_test, y_pred)
     print(f"\nFinal Test Accuracy: {accuracy:.4f}\n")
     print("Classification Report:")
-    print(classification_report(y_test, preds))
+    print(classification_report(y_test, y_pred))
 
     path = Path("model/")
     if path.exists() is False:
@@ -145,6 +146,12 @@ def main():
     with open("model/feature_meta.json", "w") as f:
         json.dump(meta, f)
 
+    cm = confusion_matrix(y_test, y_pred)
+
+    print("Confusion Matrix:")
+    print(cm)
+
+    generate_confusion_matrix_visualization(cm)
 
 if __name__ == "__main__":
     main()
