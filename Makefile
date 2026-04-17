@@ -1,19 +1,22 @@
 .PHONY: all data train test clean
 
+PY = uv run python
+PYTEST = uv run pytest
+
 # Run everything
 all: clean data train test
 
 # Extract / build dataset
 data:
-	python tools/get_data.py
+	$(PY) tools/get_data.py
 
 # Train model
 train:
-	python src/main.py
+	$(PY) -m src.main
 
 # Run tests
 test:
-	pytest tests/
+	$(PYTEST) tests/
 
 # Clean generated artifacts
 clean:

@@ -11,19 +11,28 @@ import warnings
 import optuna
 import json
 
+from src.preprocess import transform
+
+
 def main():
     warnings.filterwarnings("ignore")
     data_set = pd.read_csv("data/training_data.csv")
 
-    X, y = data_set.drop('label', axis=1), data_set[['label']]
-    y = LabelEncoder().fit_transform(data_set['label'])
+    X, y = data_set.drop("label", axis=1), data_set[["label"]]
+    y = LabelEncoder().fit_transform(data_set["label"])
 
     categorical_columns = X.select_dtypes(exclude=np.number).columns
-    numerical_columns = X.select_dtypes(include=np.number).columns
-    
+    category_maps = {}
+
     for column in categorical_columns:
-        X[column] = X[column].fillna('Unknown')
-        X[column] = X[column].astype('category').cat.codes
+        X[column] = X[column].fillna("Unknown")
+        X[column] = X[column].astype("category")
+
+        category_maps[column] = {
+            category: i for i, category in enumerate(X[column].cat.categories)
+        }
+
+    X = transform(X, X.columns, category_maps)
 
     print(f"Original class distribution: {Counter(y)}")
 
@@ -73,7 +82,7 @@ def main():
     best_params = {
         "objective": "binary:logistic",
         "tree_method": "hist",
-        **study.best_params
+        **study.best_params,
     }
 
     # Determine best number of boosting rounds
@@ -117,31 +126,25 @@ def main():
     print(classification_report(y_test, preds))
 
     path = Path("model/")
-    path.mkdir()
+    if path.exists() is False:
+        path.mkdir()
 
     with open("model/config.json", "w") as f:
         f.write(model.save_config())
-    
-    model.save_model("model/model.ubj")
 
-    category_maps = {
-        col: list(X[col].astype("category").cat.categories)
-        for col in categorical_columns
-    }
+    model.save_model("model/model.ubj")
 
     with open("model/category_maps.json", "w") as f:
         json.dump(category_maps, f)
-    
+
     with open("model/threshold.json", "w") as f:
         json.dump({"threshold": best_thresh}, f)
-    
-    meta = {
-    "numeric_cols": list(numerical_columns),
-    "categorical_cols": list(categorical_columns)
-    }
+
+    meta = {"feature_cols": list(X.columns)}
 
     with open("model/feature_meta.json", "w") as f:
         json.dump(meta, f)
+
 
 if __name__ == "__main__":
     main()
