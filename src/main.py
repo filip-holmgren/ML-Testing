@@ -11,6 +11,7 @@ import numpy as np
 import warnings
 import optuna
 import json
+import shap
 
 from src.preprocess import transform
 from src.confusion_matrix_generator import generate_confusion_matrix_visualization
@@ -152,6 +153,15 @@ def main():
     print(cm)
 
     generate_confusion_matrix_visualization(cm)
+
+    pred = model.predict(dtest, output_margin=True)
+    explainer = shap.TreeExplainer(model)
+    explanation = explainer(X_test)
+
+    shap_values = explanation.values
+    np.abs(shap_values.sum(axis=1) + explanation.base_values - pred).max()
+
+    shap.plots.beeswarm(explanation, max_display=len(X_test.columns))
 
 if __name__ == "__main__":
     main()

@@ -66,3 +66,4 @@ def generate_confusion_matrix_visualization(cm):
             ha="center", va="center", rotation=90)
 
     plt.savefig("data/confusion_matrix.png", dpi=300, bbox_inches="tight")
+    plt.close(fig)
