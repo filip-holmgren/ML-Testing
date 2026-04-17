@@ -1,14 +1,59 @@
-# ML Testing
+# ML Pipeline Project
 
-## Running
-The project uses `uv` for python venv management
+This project uses **uv** for Python dependency management and a Makefile to orchestrate the workflow.
 
-To run the project simply run
+## Requirements
+
+- Python 3.10+
+- [uv](https://github.com/astral-sh/uv)
+- PostgreSQL database access
+
+## Setup
+
+Create environment and install dependencies:
 ```bash
-$ uv run ./main.py
+$ uv sync
 ```
 
-## Current results
+## Environment Variables
+| env var      | description                                          |
+|--------------|------------------------------------------------------|
+| DATABASE_URL | The url of the postgresql database you want to query |
+
+
+## Makefile Commands
+### Run full pipeline
+```bash
+$ make all
+```
+
+### Extract dataset from database
+```bash
+make data
+```
+
+### Train model
+```bash
+$ make train
+```
+
+### Run tests
+```bash
+$ make test
+```
+
+### Clean generated artifacts
+```bash
+$ make clean
+```
+
+## Testing
+Run tests with:
+```bash
+$ pytest tests/
+```
+
+## Current performance
 ```
 Final Test Accuracy: 0.9794
 
@@ -23,5 +68,6 @@ Classification Report:
 weighted avg       0.98      0.98      0.98       291
 ```
 
-Class 0.0 is true positive
-Class 1.0 is false positive
+> [!NOTE]
+> * Class 0.0 is true positive 
+> * Class 1.0 is false positive
