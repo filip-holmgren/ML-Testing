@@ -3,6 +3,7 @@ from sklearn.metrics import accuracy_score, classification_report, f1_score
 from sklearn.preprocessing import LabelEncoder
 from imblearn.over_sampling import SMOTE
 from collections import Counter
+from pathlib import Path
 import xgboost as xgb
 import pandas as pd
 import numpy as np
@@ -12,7 +13,7 @@ import json
 
 def main():
     warnings.filterwarnings("ignore")
-    data_set = pd.read_csv("training_data.csv")
+    data_set = pd.read_csv("data/training_data.csv")
 
     X, y = data_set.drop('label', axis=1), data_set[['label']]
     y = LabelEncoder().fit_transform(data_set['label'])
@@ -115,20 +116,23 @@ def main():
     print("Classification Report:")
     print(classification_report(y_test, preds))
 
-    with open("config.json", "w") as f:
+    path = Path("model/")
+    path.mkdir()
+
+    with open("model/config.json", "w") as f:
         f.write(model.save_config())
     
-    model.save_model("model.ubj")
+    model.save_model("model/model.ubj")
 
     category_maps = {
         col: list(X[col].astype("category").cat.categories)
         for col in categorical_columns
     }
 
-    with open("category_maps.json", "w") as f:
+    with open("model/category_maps.json", "w") as f:
         json.dump(category_maps, f)
     
-    with open("threshold.json", "w") as f:
+    with open("model/threshold.json", "w") as f:
         json.dump({"threshold": best_thresh}, f)
     
     meta = {
@@ -136,7 +140,7 @@ def main():
     "categorical_cols": list(categorical_columns)
     }
 
-    with open("feature_meta.json", "w") as f:
+    with open("model/feature_meta.json", "w") as f:
         json.dump(meta, f)
 
 if __name__ == "__main__":

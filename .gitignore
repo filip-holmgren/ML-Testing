@@ -9,9 +9,8 @@ wheels/
 # Virtual environments
 .venv
 
-training_data.csv*
-model.ubj
-config.json
-category_maps.json
-feature_meta.json
-threshold.json
+data/
+model/
+
+.env
+.vscode/
