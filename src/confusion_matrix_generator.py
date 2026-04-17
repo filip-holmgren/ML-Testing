@@ -60,10 +60,9 @@ def generate_confusion_matrix_visualization(cm):
     ax.add_patch(top_rect)
     ax.add_patch(left_rect)
 
-    ax.text(3, 0.865, "Predicted positive",
+    ax.text(3, 0.865, "Predicted label",
             ha="center", va="center")
-    ax.text(0.865, 3, "Actual positive",
+    ax.text(0.865, 3, "Actual label",
             ha="center", va="center", rotation=90)
 
     plt.savefig("data/confusion_matrix.png", dpi=300, bbox_inches="tight")
-    plt.show()
