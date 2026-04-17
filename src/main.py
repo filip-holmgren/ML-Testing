@@ -1,6 +1,6 @@
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score, classification_report, f1_score
-from sklearn.preprocessing import OrdinalEncoder
+from sklearn.preprocessing import LabelEncoder
 from imblearn.over_sampling import SMOTE
 from collections import Counter
 import xgboost as xgb
@@ -15,30 +15,20 @@ def main():
     data_set = pd.read_csv("training_data.csv")
 
     X, y = data_set.drop('label', axis=1), data_set[['label']]
+    y = LabelEncoder().fit_transform(data_set['label'])
 
-    # Encode labels to 0/1
-    y_encoded = OrdinalEncoder().fit_transform(y).ravel()
+    categorical_columns = X.select_dtypes(exclude=np.number).columns
+    numerical_columns = X.select_dtypes(include=np.number).columns
+    
+    for column in categorical_columns:
+        X[column] = X[column].fillna('Unknown')
+        X[column] = X[column].astype('category').cat.codes
 
-    # Encode categorical features
-    cats = X.select_dtypes(exclude=np.number).columns.tolist()
-    for col in cats:
-        X[col] = X[col].astype('category')
-
-    # Fill numeric columns
-    num_cols = X.select_dtypes(include=np.number).columns
-    X[num_cols] = X[num_cols].fillna(0)
-
-    # Fill categorical columns
-    cat_cols = X.select_dtypes(exclude=np.number).columns
-    for col in cat_cols:
-        X[col] = X[col].cat.add_categories('missing').fillna('missing')
-        X[col] = X[col].cat.codes  # string → integer, NaN → -1
-
-    print(f"Original class distribution: {Counter(y_encoded)}")
+    print(f"Original class distribution: {Counter(y)}")
 
     # Split train/test
     X_train, X_test, y_train, y_test = train_test_split(
-        X, y_encoded, random_state=1, stratify=y_encoded
+        X, y, random_state=1, stratify=y
     )
 
     # Apply SMOTE to training data
@@ -132,7 +122,7 @@ def main():
 
     category_maps = {
         col: list(X[col].astype("category").cat.categories)
-        for col in cat_cols
+        for col in categorical_columns
     }
 
     with open("category_maps.json", "w") as f:
@@ -142,8 +132,8 @@ def main():
         json.dump({"threshold": best_thresh}, f)
     
     meta = {
-    "numeric_cols": list(num_cols),
-    "categorical_cols": list(cat_cols)
+    "numeric_cols": list(numerical_columns),
+    "categorical_cols": list(categorical_columns)
     }
 
     with open("feature_meta.json", "w") as f:
