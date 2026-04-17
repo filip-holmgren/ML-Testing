@@ -1,4 +1,4 @@
-# ML Pipeline Project
+# ML Project
 
 This project uses **uv** for Python dependency management and a Makefile to orchestrate the workflow.
 
