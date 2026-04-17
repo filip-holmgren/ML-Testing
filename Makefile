@@ -16,7 +16,7 @@ train:
 
 # Run tests
 test:
-	$(PYTEST) tests/
+	$(PYTEST) $(ARGS)
 
 # Clean generated artifacts
 clean:
