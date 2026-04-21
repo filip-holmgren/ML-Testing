@@ -8,11 +8,11 @@ all: clean data train test
 
 # Extract / build dataset
 data:
-	$(PY) tools/get_data.py
+	$(PY) tools/get_data.py $(ARGS)
 
 # Train model
 train:
-	$(PY) -m src.main
+	$(PY) -m src.main $(ARGS)
 
 # Run tests
 test:
