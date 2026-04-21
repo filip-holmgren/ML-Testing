@@ -1,7 +1,7 @@
 import matplotlib.pyplot as plt
 import matplotlib.patches as patches
 
-def generate_confusion_matrix_visualization(cm):
+def generate_confusion_matrix_visualization(cm, confusion_matrix_output_path: str):
     tp = cm[0,0]
     fp = cm[0,1]
     fn = cm[1,0]
@@ -65,5 +65,5 @@ def generate_confusion_matrix_visualization(cm):
     ax.text(0.865, 3, "Actual label",
             ha="center", va="center", rotation=90)
 
-    plt.savefig("data/confusion_matrix.png", dpi=300, bbox_inches="tight")
+    plt.savefig(confusion_matrix_output_path, dpi=300, bbox_inches="tight")
     plt.close(fig)
