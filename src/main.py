@@ -8,6 +8,7 @@ from pathlib import Path
 import xgboost as xgb
 import pandas as pd
 import numpy as np
+import matplotlib.pyplot as plt
 import warnings
 import optuna
 import json
@@ -161,7 +162,8 @@ def main():
     shap_values = explanation.values
     np.abs(shap_values.sum(axis=1) + explanation.base_values - pred).max()
 
-    shap.plots.beeswarm(explanation, max_display=len(X_test.columns))
+    shap.plots.beeswarm(explanation, max_display=len(X_test.columns), show=False)
+    plt.savefig("data/shap_visualized_data.png", bbox_inches="tight")
 
 if __name__ == "__main__":
     main()
