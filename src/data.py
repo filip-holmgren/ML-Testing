@@ -32,7 +32,9 @@ def load_data(path: str) -> tuple[pd.DataFrame, np.ArrayLike, dict]:
     return X, y, category_maps
 
 
-def split_data(X: pd.DataFrame, y: np.ArrayLike, test_size: int, random_state: int) -> list:
+def split_data(
+    X: pd.DataFrame, y: np.ArrayLike, test_size: int, random_state: int
+) -> list:
     return train_test_split(
         X, y, random_state=random_state, stratify=y, test_size=test_size
     )

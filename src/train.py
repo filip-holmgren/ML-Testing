@@ -6,7 +6,10 @@ import optuna
 
 from src.config import Config
 
-def train_model(X_train_res: any, y_train_res: any, X_test: any, y_test: any, config: Config) -> tuple[xgb.Booster, any]:
+
+def train_model(
+    X_train_res: any, y_train_res: any, X_test: any, y_test: any, config: Config
+) -> tuple[xgb.Booster, any]:
     dtrain = xgb.DMatrix(X_train_res, y_train_res)
     dtest = xgb.DMatrix(X_test, y_test)
 
@@ -73,6 +76,7 @@ def train_model(X_train_res: any, y_train_res: any, X_test: any, y_test: any, co
 
     return model, best_thresh
 
+
 def optimize_threshold(y_test: any, y_prob: pd.ndarray) -> any:
     best_f1, best_thresh = 0, 0.5
     for thresh in np.arange(0.1, 0.9, 0.01):
@@ -80,7 +84,7 @@ def optimize_threshold(y_test: any, y_prob: pd.ndarray) -> any:
         f1 = f1_score(y_test, pred)
         if f1 > best_f1:
             best_f1, best_thresh = f1, thresh
-    
+
     print(f"Optimal threshold for class 1: {best_thresh:.2f}, F1: {best_f1:.4f}")
 
     return best_thresh

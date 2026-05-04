@@ -1,18 +1,23 @@
 import matplotlib.pyplot as plt
 import matplotlib.patches as patches
 
+
 def generate_confusion_matrix_visualization(cm, confusion_matrix_output_path: str):
-    tp = cm[0,0]
-    fp = cm[0,1]
-    fn = cm[1,0]
-    tn = cm[1,1]
+    tp = cm[0, 0]
+    fp = cm[0, 1]
+    fn = cm[1, 0]
+    tn = cm[1, 1]
 
     row_totals = cm.sum(axis=1)
     col_totals = cm.sum(axis=0)
     grand_total = cm.sum()
 
     grid = [
-        [f"Total\n{row_totals[0]} + {row_totals[1]} = {grand_total}", f"True Positive\n{col_totals[0]}", f"False Positive\n{col_totals[1]}"],
+        [
+            f"Total\n{row_totals[0]} + {row_totals[1]} = {grand_total}",
+            f"True Positive\n{col_totals[0]}",
+            f"False Positive\n{col_totals[1]}",
+        ],
         [f"True Positive\n{row_totals[0]}", tp, fp],
         [f"False Positive\n{row_totals[1]}", fn, tn],
     ]
@@ -41,29 +46,39 @@ def generate_confusion_matrix_visualization(cm, confusion_matrix_output_path: st
 
             x_offset = 1
             y_offset = 1
-            rect = patches.Rectangle((x + x_offset, y + y_offset), 1, 1, facecolor=face, edgecolor="#a2a9b1")
+            rect = patches.Rectangle(
+                (x + x_offset, y + y_offset), 1, 1, facecolor=face, edgecolor="#a2a9b1"
+            )
             ax.add_patch(rect)
 
-            ax.text(x + x_offset + 0.5, y + y_offset  + 0.5, str(val), ha="center", va="center")
+            ax.text(
+                x + x_offset + 0.5,
+                y + y_offset + 0.5,
+                str(val),
+                ha="center",
+                va="center",
+            )
 
     top_rect = patches.Rectangle(
-        (2, 0.75), 2, 0.25,  # x, y, width, height
+        (2, 0.75),
+        2,
+        0.25,  # x, y, width, height
         facecolor="#4ad2d260",
-        edgecolor="#a2a9b1"
+        edgecolor="#a2a9b1",
     )
     left_rect = patches.Rectangle(
-        (0.75, 2), 0.25, 2,  # x, y, width, height
+        (0.75, 2),
+        0.25,
+        2,  # x, y, width, height
         facecolor="#d2d23d60",
-        edgecolor="#a2a9b1"
+        edgecolor="#a2a9b1",
     )
 
     ax.add_patch(top_rect)
     ax.add_patch(left_rect)
 
-    ax.text(3, 0.865, "Predicted label",
-            ha="center", va="center")
-    ax.text(0.865, 3, "Actual label",
-            ha="center", va="center", rotation=90)
+    ax.text(3, 0.865, "Predicted label", ha="center", va="center")
+    ax.text(0.865, 3, "Actual label", ha="center", va="center", rotation=90)
 
     plt.savefig(confusion_matrix_output_path, dpi=300, bbox_inches="tight")
     plt.close(fig)

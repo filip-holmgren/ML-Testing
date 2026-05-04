@@ -1,14 +1,10 @@
 from sklearn.metrics import accuracy_score, classification_report, f1_score
 from sklearn.metrics import confusion_matrix
-from collections import Counter
 from pathlib import Path
 import xgboost as xgb
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
-import warnings
-import argparse
-import optuna
 import json
 import shap
 
@@ -41,7 +37,9 @@ def save_artifacts(
         json.dump(meta, f)
 
 
-def evaluate_and_visualize(model: xgb.Booster, X_test: any, y_test: any, threshold: any, config: Config):
+def evaluate_and_visualize(
+    model: xgb.Booster, X_test: any, y_test: any, threshold: any, config: Config
+):
     dtest = xgb.DMatrix(X_test)
 
     y_prob = model.predict(dtest)

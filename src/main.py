@@ -1,5 +1,4 @@
 import warnings
-import argparse
 
 from src.config import get_config
 from src.data import load_data, split_data, apply_smote
